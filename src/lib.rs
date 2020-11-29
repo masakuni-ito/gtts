@@ -18,10 +18,8 @@ const FRAGMENT: &AsciiSet = &CONTROLS.add(b' ').add(b'"').add(b'<').add(b'>').ad
 /// Use google translate to get a audio version of your text and save this in a file.
 /// Return true if everything succeed.
 pub fn save_to_file(text: &str, language: &str, filename: &str) -> bool {
-    let len = text.len();
-    let text = utf8_percent_encode(text, FRAGMENT).to_string();
 
-    if let Ok(rep) = get(format!("https://translate.google.com/translate_tts?ie=UTF-8&q={}&total=1&idx=0&textlen={}&tl={}&client=tw-ob", text, len, language)).send() {
+    if let Ok(rep) = get(get_url(text, language)).send() {
         if let Ok(mut file) = File::create(filename) {
             let bytes = rep.as_bytes();
             if bytes.len() > 0 {
@@ -35,17 +33,28 @@ pub fn save_to_file(text: &str, language: &str, filename: &str) -> bool {
     false
 }
 
+pub fn get_url(text: &str, language: &str) -> String {
+    let len = text.len();
+    let text = utf8_percent_encode(text, FRAGMENT).to_string();
+    return format!("https://translate.google.com/translate_tts?ie=UTF-8&q={}&total=1&idx=0&tl={}&textlen={}&client=tw-ob", text, language, len);
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_in_en() {
+    fn test_save_to_file_in_en() {
         assert!(save_to_file("Hello world!", "en", "test_en.mp3"));
     }
 
     #[test]
-    fn test_in_ja() {
+    fn test_save_to_file_in_ja() {
         assert!(save_to_file("こんにちは!", "ja", "test_ja.mp3"));
+    }
+
+    #[test]
+    fn test_get_url() {
+        assert_eq!(get_url("こんにちは!", "ja").is_empty(), false);
     }
 }
