@@ -5,7 +5,7 @@
 //!
 //! ```
 //! # use gtts::save_to_file;
-//! save_to_file("Hello world!", "test", "en");
+//! save_to_file("Hello world!", "en", "test_sample.mp3");
 //! ```
 
 use percent_encoding::{AsciiSet, utf8_percent_encode, CONTROLS};
@@ -17,7 +17,7 @@ const FRAGMENT: &AsciiSet = &CONTROLS.add(b' ').add(b'"').add(b'<').add(b'>').ad
 
 /// Use google translate to get a audio version of your text and save this in a file.
 /// Return true if everything succeed.
-pub fn save_to_file(text: &str, filename: &str, language: &str) -> bool {
+pub fn save_to_file(text: &str, language: &str, filename: &str) -> bool {
     let len = text.len();
     let text = utf8_percent_encode(text, FRAGMENT).to_string();
 
@@ -41,11 +41,11 @@ mod tests {
 
     #[test]
     fn test_in_en() {
-        assert!(save_to_file("Hello world!", "test_en.mp3", "en"));
+        assert!(save_to_file("Hello world!", "en", "test_en.mp3"));
     }
 
     #[test]
     fn test_in_ja() {
-        assert!(save_to_file("こんにちは!", "test_ja.mp3", "ja"));
+        assert!(save_to_file("こんにちは!", "ja", "test_ja.mp3"));
     }
 }
